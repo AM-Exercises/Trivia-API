@@ -176,7 +176,7 @@ POST '/quizzes'
   For example:
 ```
 {
-   "question" : "Who is the first person to walk on the Moon?",
+   "question" : "Who was the first person to walk on the Moon?",
    "answer" : "Neil Armstrong",
    "category" : "1",
    "difficulty" : 1
