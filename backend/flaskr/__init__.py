@@ -208,7 +208,6 @@ def create_app(test_config=None):
       def get_questions_by_quiz_category(quiz_category_id):
             if quiz_category_id == 0:
                   questions = Question.query.all()
-        
             else:
                   questions = Question.query.filter(Question.category==quiz_category_id).all()
             return questions
