@@ -78,12 +78,14 @@ POST '/questions/search'
 GET '/categories/<int:category_id>/questions'
 POST '/quizzes'
 
+```
 
-GET '/categories'
+**GET '/categories'**
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
 - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
 
+```
 {
   "categories": {
     "1": "Science", 
@@ -95,11 +97,13 @@ GET '/categories'
   }, 
   "success": true
 }
+```
 
-GET '\questions?page=<page_number>'
+**GET '\questions?page=<page_number>'**
 - Fetches a dictionary of questions per page for all categories.
 - Optional Request Arguments: page (int)
-- Returns: example response for page=1:
+- Returns: an example response for page=1:
+```
 {
   "categories": {
     "1": "Science", 
@@ -136,11 +140,12 @@ GET '\questions?page=<page_number>'
   "success": true, 
   "total_questions": 3
 }
-
-DELETE '/questions/<int:question_id>'
+```
+**DELETE '/questions/<int:question_id>'**
 - Deletes a question with a question id.
 - Request Arguments: question_id (int)
-- Returns: example response:
+- Returns: an example response:
+```
 {
     "current_questions": [
         {
@@ -162,9 +167,9 @@ DELETE '/questions/<int:question_id>'
     "success": true,
     "total_questions": 18
 }
+```
 
-
-POST '/questions'
+**POST '/questions'**
 - Creates a new question.
 - Request Arguments: a json body. For example:
 {
@@ -174,6 +179,7 @@ POST '/questions'
    "difficulty" : 1
  }
 - Returns:
+```
 {
     "created": 29,
     "current_questions": [
@@ -202,11 +208,12 @@ POST '/questions'
     "success": true,
     "total_questions": 19
 }
-
-POST '/questions/search'
+```
+**POST '/questions/search'**
 - Searches for questions with searchTerm.
 - Request Arguments: searchTerm (string)
 - Returns:
+```
 {
     "current_category": null,
     "questions": [
@@ -242,11 +249,12 @@ POST '/questions/search'
     "success": true,
     "total_questions": 19
 }
-
-GET '/categories/<int:category_id>/questions'
+```
+***GET '/categories/<int:category_id>/questions'***
 - Get questions per category id.
 - Request Arguments: category_id (int)
 - Returns:
+```
 {
   "current_category": 1, 
   "questions": [
@@ -268,17 +276,20 @@ GET '/categories/<int:category_id>/questions'
   "success": true, 
   "total_questions": 2
 }
-
-POST '/quizzes'
+```
+**POST '/quizzes'**
 - Returns a question for a quiz.
 - Request Arguments: a json body with: 
         1)previous questions - an array of previous question ids 
         2)quiz category.
 for example:
+```
 {"previous_questions": [],
 "quiz_category": {"type": "History", "id": "4"}}
+```
 - Returns: a question in the category which was not seen before.
 For example:
+```
 {
     "question": {
         "answer": "Muhammad Ali",
