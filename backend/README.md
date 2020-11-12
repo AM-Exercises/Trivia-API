@@ -172,13 +172,17 @@ POST '/quizzes'
 **POST '/questions'**
 - Creates a new question.
 - Request Arguments: a json body. For example:
+```
 {
    "question" : "Who is the first person to walk on the Moon?",
    "answer" : "Neil Armstrong",
    "category" : "1",
    "difficulty" : 1
  }
+ ```
+ 
 - Returns:
+
 ```
 {
     "created": 29,
