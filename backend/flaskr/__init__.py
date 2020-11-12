@@ -22,21 +22,23 @@ def create_app(test_config=None):
             response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
             return response
 
+      '''
+      Create an endpoint to handle GET requests
+      for all available categories.
+      '''
   
       @app.route('/categories', methods=['GET'])
       def get_categories():
             categories = Category.query.all()
-            format_categories = [category.format() for category in categories]
       
             if len(categories) == 0:
                   abort(404)
 
             return jsonify({
                   "success":True,
-                  "categories":format_categories
+                  "categories":{category.id: category.type for category in categories}
             })
-      '''
-       @TODO: 
+      ''' 
        Create an endpoint to handle GET requests for questions, 
        including pagination (every 10 questions). 
        This endpoint should return a list of questions, 
@@ -62,9 +64,7 @@ def create_app(test_config=None):
             current_questions= paginate_questions(request,questions)
 
             categories = Category.query.all()
-            format_categories = [category.format() for category in categories]
-      
-
+           
             if len(current_questions) == 0:
                   abort(404)
         
@@ -72,12 +72,11 @@ def create_app(test_config=None):
                   "success":True,
                   "total_questions":len(questions),
                   "questions":current_questions,
-                  "categories":format_categories,
+                  "categories":{category.id: category.type for category in categories},
                   "current_category":None
             })
 
       '''
-      @TODO: 
       Create an endpoint to DELETE question using a question ID. 
 
       TEST: When you click the trash icon next to a question, the question will be removed.
@@ -104,8 +103,7 @@ def create_app(test_config=None):
                   abort(422)
       
 
-      '''
-      @TODO: 
+      ''' 
       Create an endpoint to POST a new question, 
       which will require the question and answer text, 
       category, and difficulty score.
@@ -141,7 +139,6 @@ def create_app(test_config=None):
             except:
                   abort(422)
       '''
-       @TODO: 
       Create a POST endpoint to get questions based on a search term. 
       It should return any questions for whom the search term 
       is a substring of the question. 
@@ -156,7 +153,7 @@ def create_app(test_config=None):
             try:
                   num_total_quesions =  len(Question.query.all())
                   body = request.get_json()
-                  search = body.get('search', None)
+                  search = body.get('searchTerm', None)
 
                   if not search:
                         abort(422)
@@ -174,7 +171,6 @@ def create_app(test_config=None):
                   abort(422)
 
       '''
-       @TODO: 
        Create a GET endpoint to get questions based on category. 
 
       TEST: In the "List" tab / main screen, clicking on one of the 
@@ -184,6 +180,7 @@ def create_app(test_config=None):
       @app.route('/categories/<int:category_id>/questions' , methods=['GET'])
       def get_question_on_category(category_id):
 
+            
             questions = Question.query.filter(Question.category==category_id)
             current_questions = paginate_questions(request, questions)
 
@@ -192,12 +189,12 @@ def create_app(test_config=None):
 
             return jsonify({
                   "success":True,
+                  "questions":current_questions,
                   "current_category":category_id,
-                  "total_questions":current_questions
-             })
+                  "total_questions":len(current_questions)
+            })
 
-      '''
-      @TODO: 
+      ''' 
       Create a POST endpoint to get questions to play the quiz. 
       This endpoint should take category and previous question parameters 
       and return a random questions within the given category, 
@@ -208,6 +205,32 @@ def create_app(test_config=None):
       and shown whether they were correct or not. 
       '''
 
+      def get_questions_by_quiz_category(quiz_category_id):
+            if quiz_category_id == 0:
+                  questions = Question.query.all()
+        
+            else:
+                  questions = Question.query.filter(Question.category==quiz_category_id).all()
+            return questions
+
+      def get_quiz_remaining_questions(previous_questions, current_questions):
+            if not previous_questions or len(previous_questions)==0:
+                   return current_questions
+            remaining_questions = []
+            for question in current_questions:
+                  if question.id not in previous_questions:
+                        remaining_questions.append(question)
+            return remaining_questions
+
+      def get_new_quiz_question(remaining_questions):
+            num_remaining_questions = len(remaining_questions)
+            if num_remaining_questions == 0:
+                  return None
+            else:
+                  rand_question_id = random.randint(0, num_remaining_questions)
+                  new_question = remaining_questions[rand_question_id]
+                  return new_question
+                  
       @app.route('/quizzes', methods=['POST'])
       def play():
 
@@ -216,28 +239,14 @@ def create_app(test_config=None):
                   quiz_category = body.get('quiz_category')
                   previous_questions = body.get('previous_questions')
 
-                  if not quiz_category or not previous_questions:
+                  if not quiz_category:
                         abort(422)
 
                   quiz_category_id = quiz_category['id']
                   
-                  if quiz_category_id == 0:
-                        questions = Question.query.all()
-        
-                  else:
-                        questions = Question.query.filter(Question.category==quiz_category_id).all()
-                  
-                  remaining_questions = []
-
-                  for question in questions:
-                        if question.id not in previous_questions:
-                                    remaining_questions.append(question)
-                  
-                  if len(remaining_questions)==0:
-                         new_question = None
-                  else:
-                        rand_question_id = random.randint(0, len(remaining_questions))
-                        new_question = remaining_questions[rand_question_id]
+                  current_questions = get_questions_by_quiz_category(quiz_category_id)
+                  remaining_questions = get_quiz_remaining_questions(previous_questions, current_questions)
+                  new_question = get_new_quiz_question(remaining_questions)
                   
                   return jsonify({
                         "success":True,
