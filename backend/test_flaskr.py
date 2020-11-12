@@ -100,7 +100,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'unprocessable')
     
     def test_get_questions_search_with_results(self):
-        res = self.client().post('/questions/search', json={'search': 'who'})
+        res = self.client().post('/questions/search', json={'searchTerm': 'who'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -109,7 +109,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 4)
     
     def test_get_questions_search_without_results(self):
-        res = self.client().post('/questions/search', json={'search': 'applejacks'})
+        res = self.client().post('/questions/search', json={'searchTerm': 'applejacks'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -132,7 +132,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['current_category'])
-        self.assertTrue(len(data['total_questions']))
+        self.assertTrue(data['total_questions'])
 
     def test_404_if_category_does_not_exist(self):
         res = self.client().get('/categories/0/questions')
@@ -146,7 +146,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_play(self):
         
         res = self.client().post('/quizzes',
-                                      json={'previous_questions': [5, 9],
+                                      json={'previous_questions': [],
                                             'quiz_category': {'type': 'History', 'id': '4'}})
         data = json.loads(res.data)
 
