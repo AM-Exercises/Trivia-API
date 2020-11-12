@@ -204,31 +204,6 @@ def create_app(test_config=None):
       one question at a time is displayed, the user is allowed to answer
       and shown whether they were correct or not. 
       '''
-
-      def get_questions_by_quiz_category(quiz_category_id):
-            if quiz_category_id == 0:
-                  questions = Question.query.all()
-            else:
-                  questions = Question.query.filter(Question.category==quiz_category_id).all()
-            return questions
-
-      def get_quiz_remaining_questions(previous_questions, current_questions):
-            if not previous_questions or len(previous_questions)==0:
-                   return current_questions
-            remaining_questions = []
-            for question in current_questions:
-                  if question.id not in previous_questions:
-                        remaining_questions.append(question)
-            return remaining_questions
-
-      def get_new_quiz_question(remaining_questions):
-            num_remaining_questions = len(remaining_questions)
-            if num_remaining_questions == 0:
-                  return None
-            else:
-                  rand_question_id = random.randint(0, num_remaining_questions)
-                  new_question = remaining_questions[rand_question_id]
-                  return new_question
                   
       @app.route('/quizzes', methods=['POST'])
       def play():
@@ -238,21 +213,33 @@ def create_app(test_config=None):
                   quiz_category = body.get('quiz_category')
                   previous_questions = body.get('previous_questions')
 
-                  if not quiz_category:
+                  if not 'quiz_category' in body or not 'previous_questions' in body:
                         abort(422)
 
                   quiz_category_id = quiz_category['id']
                   
-                  current_questions = get_questions_by_quiz_category(quiz_category_id)
-                  remaining_questions = get_quiz_remaining_questions(previous_questions, current_questions)
-                  new_question = get_new_quiz_question(remaining_questions)
-                  
+                  if quiz_category_id == 0:
+                        questions = Question.query.filter(~Question.id.in_(previous_questions)).all()
+                  else:
+                        questions = Question.query.filter(Question.category==quiz_category_id).filter(~Question.id.in_(previous_questions)).all()
+
+                  num_remaining_questions = len(questions)
+                  new_question = None
+
+                  if num_remaining_questions > 0:
+                        rand_question_id = random.randint(0, num_remaining_questions-1)
+                        new_question = questions[rand_question_id]
+
+                  if new_question is not None:
+                        new_question = new_question.format()
+
                   return jsonify({
                         "success":True,
-                        "question":new_question.format()
+                        "question":new_question
                   })
 
-            except:
+            except ValueError as e:
+                  print(e)
                   abort(422)
 
       @app.errorhandler(404)
