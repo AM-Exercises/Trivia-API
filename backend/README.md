@@ -171,7 +171,9 @@ POST '/quizzes'
 
 **POST '/questions'**
 - Creates a new question.
-- Request Arguments: a json body. For example:
+- Request Arguments: a json body with arguments for creating a new question.
+  The arguments are: question (string), answer(string), category(string) and difficulty(int).
+  For example:
 ```
 {
    "question" : "Who is the first person to walk on the Moon?",
