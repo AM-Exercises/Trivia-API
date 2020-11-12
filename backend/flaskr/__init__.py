@@ -238,8 +238,7 @@ def create_app(test_config=None):
                         "question":new_question
                   })
 
-            except ValueError as e:
-                  print(e)
+            except:
                   abort(422)
 
       @app.errorhandler(404)
